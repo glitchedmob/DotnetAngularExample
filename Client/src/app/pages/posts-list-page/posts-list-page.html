@@ -32,7 +32,7 @@
 
         <p>{{ previewContent(post.content) }}</p>
 
-        <footer>
+        <footer class="actions">
           <a [routerLink]="['/posts', post.id]" role="button" class="secondary">Read post</a>
           <a [routerLink]="['/posts', post.id, 'edit']" role="button" class="contrast">Edit</a>
         </footer>

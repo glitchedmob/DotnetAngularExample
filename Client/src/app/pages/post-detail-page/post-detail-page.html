@@ -23,7 +23,7 @@
 
       <p style="white-space: pre-wrap;">{{ currentPost.content }}</p>
 
-      <footer>
+      <footer class="actions">
         <a [routerLink]="['/posts', currentPost.id, 'edit']" role="button" class="contrast">Edit post</a>
         <button type="button" class="secondary" [disabled]="isDeletingPost()" [attr.aria-busy]="isDeletingPost()" (click)="deletePost()">
           Delete post
