@@ -1,7 +1,8 @@
+using Api.Data;
 using Api.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Api.Data;
+namespace Api.Seeder;
 
 public static class BlogDbContextSeed
 {

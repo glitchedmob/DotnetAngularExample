@@ -1,4 +1,5 @@
 using Api.Data;
+using Api.Seeder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
