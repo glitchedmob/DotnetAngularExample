@@ -1,7 +1,6 @@
 using Api.Data;
 using Api.Repositories;
 using Api.Services;
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,15 +17,13 @@ builder.Services.AddCors(options =>
     });
 });
 
-var connectionString = ResolveSqliteConnectionString(
-    builder.Configuration.GetConnectionString("BlogDatabase"),
+var connectionString = BlogDatabaseConnection.ResolveConnectionString(
+    builder.Configuration.GetConnectionString(BlogDatabaseConnection.ConnectionStringName),
     builder.Environment.ContentRootPath);
 
 builder.Services.AddDbContext<BlogDbContext>(options =>
 {
-    options.UseSqlite(connectionString)
-        .UseSeeding((context, _) => BlogDbContextSeed.Seed((BlogDbContext)context))
-        .UseAsyncSeeding((context, _, cancellationToken) => BlogDbContextSeed.SeedAsync((BlogDbContext)context, cancellationToken));
+    options.UseSqlite(connectionString);
 });
 
 builder.Services.AddScoped<IPostRepository, PostRepository>();
@@ -44,30 +41,3 @@ app.UseCors("AllowAll");
 app.MapControllers();
 
 app.Run();
-
-static string ResolveSqliteConnectionString(string? configuredConnectionString, string contentRootPath)
-{
-    var connectionStringBuilder = new SqliteConnectionStringBuilder(
-        string.IsNullOrWhiteSpace(configuredConnectionString)
-            ? "Data Source=App_Data/blog.db"
-            : configuredConnectionString);
-
-    if (string.IsNullOrWhiteSpace(connectionStringBuilder.DataSource))
-    {
-        connectionStringBuilder.DataSource = "App_Data/blog.db";
-    }
-
-    if (!Path.IsPathRooted(connectionStringBuilder.DataSource))
-    {
-        connectionStringBuilder.DataSource = Path.GetFullPath(
-            Path.Combine(contentRootPath, connectionStringBuilder.DataSource));
-    }
-
-    var databaseDirectory = Path.GetDirectoryName(connectionStringBuilder.DataSource);
-    if (!string.IsNullOrWhiteSpace(databaseDirectory))
-    {
-        Directory.CreateDirectory(databaseDirectory);
-    }
-
-    return connectionStringBuilder.ToString();
-}
