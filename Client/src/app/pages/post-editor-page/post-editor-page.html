@@ -1,0 +1,33 @@
+<section>
+  <p><a routerLink="/posts">Back to posts</a></p>
+
+  <header>
+    <h1>{{ pageTitle() }}</h1>
+    <p>
+      @if (isEditMode()) {
+        Update an existing post.
+      } @else {
+        Create a new post.
+      }
+    </p>
+  </header>
+
+  @if (isLoading()) {
+    <article aria-busy="true">Loading post...</article>
+  } @else {
+    @if (errorMessage()) {
+      <article>
+        <p>{{ errorMessage() }}</p>
+      </article>
+    }
+
+    @if (!isEditMode() || initialValue()) {
+      <app-post-form
+        [initialValue]="initialValue()"
+        [submitLabel]="submitLabel()"
+        [busy]="isSubmitting()"
+        (submitted)="savePost($event)"
+      />
+    }
+  }
+</section>

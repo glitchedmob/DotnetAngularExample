@@ -1,0 +1,128 @@
+<section>
+  <p><a routerLink="/posts">Back to posts</a></p>
+
+  @if (isLoading()) {
+    <article aria-busy="true">Loading post...</article>
+  } @else if (errorMessage() && !post()) {
+    <article>
+      <p>{{ errorMessage() }}</p>
+      <a routerLink="/posts" role="button">Return to posts</a>
+    </article>
+  } @else if (post(); as currentPost) {
+    <article>
+      <header>
+        <h1>{{ currentPost.title }}</h1>
+        <p>
+          <small>Published {{ currentPost.createdAt | date: 'medium' }}</small>
+          @if (wasEdited()) {
+            <br />
+            <small>Edited {{ currentPost.updatedAt | date: 'medium' }}</small>
+          }
+        </p>
+      </header>
+
+      <p style="white-space: pre-wrap;">{{ currentPost.content }}</p>
+
+      <footer>
+        <a [routerLink]="['/posts', currentPost.id, 'edit']" role="button" class="contrast">Edit post</a>
+        <button type="button" class="secondary" [disabled]="isDeletingPost()" [attr.aria-busy]="isDeletingPost()" (click)="deletePost()">
+          Delete post
+        </button>
+      </footer>
+    </article>
+
+    @if (errorMessage()) {
+      <article>
+        <p>{{ errorMessage() }}</p>
+      </article>
+    }
+
+    <section>
+      <header>
+        <h2>Comments</h2>
+      </header>
+
+      @if (commentErrorMessage()) {
+        <article>
+          <p>{{ commentErrorMessage() }}</p>
+        </article>
+      }
+
+      @for (comment of comments(); track comment.id) {
+        <article>
+          <header>
+            <h3>{{ comment.authorName }}</h3>
+            <p><small>{{ comment.createdAt | date: 'medium' }}</small></p>
+          </header>
+
+          <p style="white-space: pre-wrap;">{{ comment.body }}</p>
+
+          <footer>
+            <button
+              type="button"
+              class="secondary"
+              [disabled]="deletingCommentId() === comment.id"
+              [attr.aria-busy]="deletingCommentId() === comment.id"
+              (click)="deleteComment(comment)"
+            >
+              Delete comment
+            </button>
+          </footer>
+        </article>
+      } @empty {
+        <article>
+          <p>No comments yet.</p>
+        </article>
+      }
+    </section>
+
+    <section>
+      <header>
+        <h2>Add a comment</h2>
+      </header>
+
+      <form [formGroup]="commentForm" (ngSubmit)="submitComment()">
+        <label>
+          Name
+          <input
+            formControlName="authorName"
+            name="authorName"
+            maxlength="100"
+            type="text"
+            [attr.aria-invalid]="commentForm.controls.authorName.invalid && commentForm.controls.authorName.touched"
+            placeholder="Your name"
+          />
+        </label>
+
+        @if (commentForm.controls.authorName.invalid && commentForm.controls.authorName.touched) {
+          <small>
+            @if (commentForm.controls.authorName.hasError('required')) {
+              Name is required.
+            } @else if (commentForm.controls.authorName.hasError('maxlength')) {
+              Name must be 100 characters or fewer.
+            }
+          </small>
+        }
+
+        <label>
+          Comment
+          <textarea
+            formControlName="body"
+            name="body"
+            rows="6"
+            [attr.aria-invalid]="commentForm.controls.body.invalid && commentForm.controls.body.touched"
+            placeholder="Share your thoughts"
+          ></textarea>
+        </label>
+
+        @if (commentForm.controls.body.invalid && commentForm.controls.body.touched) {
+          <small>Comment body is required.</small>
+        }
+
+        <button type="submit" [disabled]="isSubmittingComment()" [attr.aria-busy]="isSubmittingComment()">
+          Add comment
+        </button>
+      </form>
+    </section>
+  }
+</section>

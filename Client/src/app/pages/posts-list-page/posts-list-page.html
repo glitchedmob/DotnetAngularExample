@@ -1,0 +1,47 @@
+<section>
+  <header>
+    <h1>Posts</h1>
+    <p>A small full-stack blog powered by ASP.NET Core and Angular.</p>
+  </header>
+
+  <p>
+    <a routerLink="/posts/new" role="button">Write a post</a>
+  </p>
+
+  @if (isLoading()) {
+    <article aria-busy="true">Loading posts...</article>
+  } @else if (errorMessage()) {
+    <article>
+      <p>{{ errorMessage() }}</p>
+      <button type="button" (click)="loadPosts()">Try again</button>
+    </article>
+  } @else {
+    @for (post of sortedPosts(); track post.id) {
+      <article>
+        <header>
+          <h2>
+            <a [routerLink]="['/posts', post.id]">{{ post.title }}</a>
+          </h2>
+          <p>
+            <small>
+              Updated {{ post.updatedAt | date: 'medium' }}
+              • {{ post.comments.length }} comments
+            </small>
+          </p>
+        </header>
+
+        <p>{{ previewContent(post.content) }}</p>
+
+        <footer>
+          <a [routerLink]="['/posts', post.id]" role="button" class="secondary">Read post</a>
+          <a [routerLink]="['/posts', post.id, 'edit']" role="button" class="contrast">Edit</a>
+        </footer>
+      </article>
+    } @empty {
+      <article>
+        <p>No posts yet.</p>
+        <p>Start by creating the first one.</p>
+      </article>
+    }
+  }
+</section>

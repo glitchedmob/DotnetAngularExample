@@ -1,0 +1,42 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()">
+  <label>
+    Title
+    <input
+      formControlName="title"
+      name="title"
+      type="text"
+      maxlength="200"
+      [attr.aria-invalid]="form.controls.title.invalid && form.controls.title.touched"
+      placeholder="A short post title"
+    />
+  </label>
+
+  @if (form.controls.title.invalid && form.controls.title.touched) {
+    <small>
+      @if (form.controls.title.hasError('required')) {
+        Title is required.
+      } @else if (form.controls.title.hasError('maxlength')) {
+        Title must be 200 characters or fewer.
+      }
+    </small>
+  }
+
+  <label>
+    Content
+    <textarea
+      formControlName="content"
+      name="content"
+      rows="10"
+      [attr.aria-invalid]="form.controls.content.invalid && form.controls.content.touched"
+      placeholder="Write the full post content here"
+    ></textarea>
+  </label>
+
+  @if (form.controls.content.invalid && form.controls.content.touched) {
+    <small>Content is required.</small>
+  }
+
+  <button type="submit" [attr.aria-busy]="busy()" [disabled]="busy()">
+    {{ submitLabel() }}
+  </button>
+</form>
