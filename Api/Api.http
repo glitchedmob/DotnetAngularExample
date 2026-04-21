@@ -1,6 +1,26 @@
 @Api_HostAddress = http://localhost:5044
 
-GET {{Api_HostAddress}}/weatherforecast/
+GET {{Api_HostAddress}}/api/posts
 Accept: application/json
+
+###
+
+POST {{Api_HostAddress}}/api/posts
+Content-Type: application/json
+
+{
+  "title": "A new post from Api.http",
+  "content": "This request hits the controller, service, repository, and SQLite database."
+}
+
+###
+
+POST {{Api_HostAddress}}/api/posts/1/comments
+Content-Type: application/json
+
+{
+  "authorName": "Api.http",
+  "body": "Nested comment routes are working too."
+}
 
 ###
