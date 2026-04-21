@@ -1,5 +1,7 @@
 # DotnetAngularExample
 
+See `ARCHITECTURE.md` for a high-level overview of the application and test setup.
+
 ## Global Tools
 
 Install these globally on your machine:
