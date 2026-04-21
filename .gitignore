@@ -303,6 +303,11 @@ Client/tmp/
 Client/out-tsc/
 Client/.sass-cache/
 
+# SQLite runtime files
+Api/App_Data/*.db
+Api/App_Data/*.db-shm
+Api/App_Data/*.db-wal
+
 # Visual Studio 6 build log
 *.plg
 
