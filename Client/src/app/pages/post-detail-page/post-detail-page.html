@@ -25,10 +25,30 @@
 
       <footer class="actions">
         <a [routerLink]="['/posts', currentPost.id, 'edit']" role="button" class="contrast">Edit post</a>
-        <button type="button" class="secondary" [disabled]="isDeletingPost()" [attr.aria-busy]="isDeletingPost()" (click)="deletePost()">
-          Delete post
-        </button>
+
+        @if (isConfirmingPostDelete()) {
+          <button type="button" [disabled]="isDeletingPost()" (click)="cancelPostDelete()">
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="secondary"
+            [disabled]="isDeletingPost()"
+            [attr.aria-busy]="isDeletingPost()"
+            (click)="deletePost()"
+          >
+            Confirm delete
+          </button>
+        } @else {
+          <button type="button" class="secondary" [disabled]="isDeletingPost()" (click)="startPostDelete()">
+            Delete post
+          </button>
+        }
       </footer>
+
+      @if (isConfirmingPostDelete()) {
+        <small>Click confirm delete to remove this post.</small>
+      }
     </article>
 
     @if (errorMessage()) {
@@ -57,16 +77,31 @@
 
           <p style="white-space: pre-wrap;">{{ comment.body }}</p>
 
-          <footer>
-            <button
-              type="button"
-              class="secondary"
-              [disabled]="deletingCommentId() === comment.id"
-              [attr.aria-busy]="deletingCommentId() === comment.id"
-              (click)="deleteComment(comment)"
-            >
-              Delete comment
-            </button>
+          <footer class="actions">
+            @if (pendingCommentDeleteId() === comment.id) {
+              <button type="button" [disabled]="deletingCommentId() === comment.id" (click)="cancelCommentDelete()">
+                Cancel
+              </button>
+              <button
+                type="button"
+                class="secondary"
+                [disabled]="deletingCommentId() === comment.id"
+                [attr.aria-busy]="deletingCommentId() === comment.id"
+                (click)="deleteComment(comment)"
+              >
+                Confirm delete
+              </button>
+              <small>Click confirm delete to remove this comment.</small>
+            } @else {
+              <button
+                type="button"
+                class="secondary"
+                [disabled]="deletingCommentId() === comment.id"
+                (click)="startCommentDelete(comment.id)"
+              >
+                Delete comment
+              </button>
+            }
           </footer>
         </article>
       } @empty {

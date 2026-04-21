@@ -25,7 +25,9 @@ export class PostDetailPage implements OnInit {
   readonly isLoading = signal(true);
   readonly isSubmittingComment = signal(false);
   readonly isDeletingPost = signal(false);
+  readonly isConfirmingPostDelete = signal(false);
   readonly deletingCommentId = signal<number | null>(null);
+  readonly pendingCommentDeleteId = signal<number | null>(null);
   readonly errorMessage = signal('');
   readonly commentErrorMessage = signal('');
   readonly post = signal<Post | null>(null);
@@ -105,8 +107,25 @@ export class PostDetailPage implements OnInit {
     }
   }
 
+  startCommentDelete(commentId: number) {
+    if (this.deletingCommentId()) {
+      return;
+    }
+
+    this.commentErrorMessage.set('');
+    this.pendingCommentDeleteId.set(commentId);
+  }
+
+  cancelCommentDelete() {
+    if (this.deletingCommentId()) {
+      return;
+    }
+
+    this.pendingCommentDeleteId.set(null);
+  }
+
   async deleteComment(comment: Comment) {
-    if (this.deletingCommentId() || !confirm(`Delete the comment from ${comment.authorName}?`)) {
+    if (this.deletingCommentId() || this.pendingCommentDeleteId() !== comment.id) {
       return;
     }
 
@@ -125,6 +144,7 @@ export class PostDetailPage implements OnInit {
           comments: post.comments.filter((existingComment) => existingComment.id !== comment.id),
         };
       });
+      this.pendingCommentDeleteId.set(null);
     } catch (error) {
       this.commentErrorMessage.set(resolveCommentErrorMessage(error));
     } finally {
@@ -132,10 +152,27 @@ export class PostDetailPage implements OnInit {
     }
   }
 
+  startPostDelete() {
+    if (this.isDeletingPost()) {
+      return;
+    }
+
+    this.errorMessage.set('');
+    this.isConfirmingPostDelete.set(true);
+  }
+
+  cancelPostDelete() {
+    if (this.isDeletingPost()) {
+      return;
+    }
+
+    this.isConfirmingPostDelete.set(false);
+  }
+
   async deletePost() {
     const post = this.post();
 
-    if (!post || this.isDeletingPost() || !confirm(`Delete \"${post.title}\"?`)) {
+    if (!post || this.isDeletingPost() || !this.isConfirmingPostDelete()) {
       return;
     }
 
@@ -148,6 +185,7 @@ export class PostDetailPage implements OnInit {
     } catch (error) {
       this.errorMessage.set(resolvePostErrorMessage(error));
     } finally {
+      this.isConfirmingPostDelete.set(false);
       this.isDeletingPost.set(false);
     }
   }
